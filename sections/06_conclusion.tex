@@ -9,9 +9,7 @@ The central empirical finding is that dense step-level reward from the \gore{}
 interpreter (acting as a Process Reward Model) substantially improves backtrack
 accuracy over sparse final-answer reward, confirming that the locus of the
 learning signal matters for search-requiring tasks.
-The Spectral-R1 analysis provides mechanistic evidence that the \textsc{Fork}
-and \textsc{Cut} primitives are encoded in a distinguishable representational
-subspace, suggesting that backtracking has a learnable internal structure.
+
 
 \paragraph{Limitations.}
 \gore{} is a synthetic environment; the gap between synthetic backtracking
@@ -27,11 +25,11 @@ Experiments are conducted at GPT-2 scale; behaviour at larger scales is unknown.
     decomposition), the YOCO decoder-decoder architecture \citep{sun2024yoco}
     is a natural fit: the self-decoder caches the static \gore{} program, and
     the cross-decoder generates the execution trace.
-    This separation would allow the Spectral-R1 analysis to isolate program
-    representations from trace representations.
-  \item \textbf{Scaling.} Repeat E1--E3 at 1B and 7B parameter scales to
-    determine whether the backtracking subspace becomes more or less separable
-    with model capacity.
+    This separation would allow spectral analysis of residual-stream activations
+    to isolate program representations from trace representations.
+  \item \textbf{Scaling.} Repeat E1--E2 at 1B and 7B parameter scales; additionally conduct
+    representational analysis to determine whether the backtracking subspace
+    becomes more or less separable with model capacity.
   \item \textbf{Constraint satisfaction.} Extend \gore{} with typed \callstmt{}
     and a constraint store to model constraint-satisfaction problems, bridging
     the gap to real-world planning and scheduling tasks.

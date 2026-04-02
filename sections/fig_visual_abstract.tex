@@ -1,0 +1,103 @@
+% Visual abstract figure — Apple-minimalist style, soft colors
+% Requires: tikz libraries shapes.geometric, arrows.meta, positioning, fit, backgrounds, calc
+
+\begin{figure}[t]
+\centering
+\begin{tikzpicture}[
+  font=\small,
+  % color palette (soft)
+  colBlue/.style   = {fill=blue!8,  draw=blue!30,  rounded corners=4pt},
+  colGreen/.style  = {fill=green!8, draw=green!30, rounded corners=4pt},
+  colPurple/.style = {fill=violet!8,draw=violet!30,rounded corners=4pt},
+  colGray/.style   = {fill=gray!6,  draw=gray!25,  rounded corners=4pt},
+  % node styles
+  panel/.style   = {rectangle, minimum width=3.8cm, minimum height=5.2cm,
+                    inner sep=8pt, align=left},
+  treenode/.style = {circle, minimum size=22pt, inner sep=0pt, align=center,
+                     draw=blue!40, fill=blue!10, font=\scriptsize\bfseries},
+  pruned/.style   = {circle, minimum size=22pt, inner sep=0pt, align=center,
+                     draw=red!40, fill=red!10, font=\scriptsize\bfseries},
+  stepnode/.style = {rectangle, rounded corners=3pt, minimum width=1.1cm,
+                     minimum height=18pt, inner sep=3pt, align=center,
+                     draw=green!40, fill=green!10, font=\scriptsize},
+  pipe/.style    = {rectangle, rounded corners=3pt, minimum width=2.6cm,
+                    minimum height=22pt, inner sep=4pt, align=center, font=\scriptsize},
+  arr/.style     = {-Stealth, line width=0.8pt, gray!60},
+  arrd/.style    = {-Stealth, line width=1pt, violet!50},
+]
+
+%% LEFT PANEL: GORE program snippet
+\node[panel, colBlue] (left) at (0,0) {};
+\node[above=2pt of left.north, font=\footnotesize\bfseries, text=blue!50!black]
+  {GORE Program};
+\node[anchor=north west, inner sep=6pt] at (left.north west) {%
+  \begin{minipage}{3.4cm}
+  \ttfamily\scriptsize
+  clause reach(X,Y) \{\\
+  \quad Fork(\\
+  \quad\quad Step(X = Y),\\
+  \quad\quad Let Z := next(X);\\
+  \quad\quad\quad Call R = @edge(X,Z);\\
+  \quad\quad\quad Step(R = true);\\
+  \quad\quad\quad reach(Z,Y)\\
+  \quad )\\
+  \}
+  \end{minipage}%
+};
+
+%% CENTER PANEL: Search tree
+\node[panel, colGreen] (center) at (4.6,0) {};
+\node[above=2pt of center.north, font=\footnotesize\bfseries, text=green!50!black]
+  {Search Tree};
+\node[treenode] (fork)  at (4.6,  1.6) {FORK};
+\node[stepnode] (s1)    at (3.3,  0.3) {STEP\\\tiny(ok)};
+\node[treenode] (fork2) at (5.8,  0.3) {FORK};
+\node[stepnode] (s2)    at (5.1, -1.0) {STEP};
+\node[pruned]   (cut)   at (6.5, -1.0) {CUT};
+\draw[arr] (fork)  -- (s1);
+\draw[arr] (fork)  -- (fork2);
+\draw[arr] (fork2) -- (s2);
+\draw[arr] (fork2) -- (cut);
+\node[font=\tiny, text=red!60, below=2pt of cut] {pruned};
+
+%% RIGHT PANEL: Training pipeline
+\node[panel, colPurple] (right) at (9.2,0) {};
+\node[above=2pt of right.north, font=\footnotesize\bfseries, text=violet!50!black]
+  {Training Pipeline};
+\node[pipe, colGray]   (lean) at (9.2,  1.8) {Lean / CoqGym\\pretraining};
+\node[pipe, colBlue]   (gore) at (9.2,  0.7) {GORE\\curriculum SFT};
+\node[pipe, colGreen]  (grpo) at (9.2, -0.4) {Dr.\ GRPO\\dense reward};
+\node[pipe, colPurple] (llm)  at (9.2, -1.5) {LLM with\\backtracking};
+\draw[arrd] (lean) -- (gore);
+\draw[arrd] (gore) -- (grpo);
+\draw[arrd] (grpo) -- (llm);
+
+%% BOTTOM: interpreter-as-PRM
+\node[rectangle, rounded corners=4pt, fill=orange!8, draw=orange!30,
+      minimum width=11.8cm, minimum height=0.7cm, align=center,
+      font=\scriptsize] (prm) at (4.6, -3.1)
+  {GORE Interpreter \textbf{=} Process Reward Model \quad
+   (dense per-step reward, no human annotation)};
+\draw[-Stealth, line width=0.9pt, orange!60]
+  (center.south) -- ++(0,-0.55) -- (prm.north -| center.south);
+\draw[-Stealth, line width=0.9pt, orange!60]
+  (prm.east) -- ++(0.2,0) |- (grpo.east);
+
+%% faint column separators
+\draw[gray!20, line width=0.5pt] (2.5, 2.9) -- (2.5,-2.5);
+\draw[gray!20, line width=0.5pt] (7.1, 2.9) -- (7.1,-2.5);
+
+\end{tikzpicture}
+\caption{%
+  \textbf{GORE visual abstract.}
+  \emph{Left}: a GORE program for graph reachability using \textsc{Fork},
+  \textsc{Step}, \textsc{Let}, and \textsc{Call}.
+  \emph{Center}: the interpreter search tree; a \textsc{Cut} node prunes one
+  branch (red) while a \textsc{Step} terminates another (green).
+  \emph{Right}: three-stage training pipeline
+  (Lean/CoqGym pretraining $\to$ GORE curriculum SFT $\to$ Dr.\,GRPO).
+  \emph{Bottom}: the GORE interpreter acts as a Process Reward Model,
+  supplying dense per-step reward without human annotation.
+}
+\label{fig:visual-abstract}
+\end{figure}

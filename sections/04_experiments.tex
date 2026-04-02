@@ -56,29 +56,14 @@ SFT initialisation; GPU memory consumption.
 \todo{Fill in results; add per-level accuracy table; add qualitative examples
       of emergent backtracking behaviour.}
 
-\subsection{E3: Spectral Analysis (Spectral-R1)}
+\subsection{E3: Representation Analysis (Future Work)}
 \label{sec:e3}
 
-We apply PCA and SVD to the residual-stream activations of the Dr.\,GRPO model,
-conditioned on the node type of the \emph{current} trace token
-(\textsc{Fork}, \textsc{Cut}, or \textsc{Step}).
-
-\paragraph{Setup.}
-We collect activations at the final residual stream position for 10\,000 trace
-tokens (balanced across node types) from the E2b model.
-We fit PCA jointly on all three conditions and inspect the leading principal
-components.
-
-\paragraph{Intervention.}
-We ablate the direction most predictive of \textsc{Fork} vs.\ \textsc{Step}
-(identified by a linear probe) and measure the drop in backtrack accuracy.
-
-\paragraph{Expected outcome.}
-We expect \textsc{Fork}/\textsc{Cut} activations to occupy a distinguishable
-subspace from \textsc{Step} activations, and ablation of this subspace to cause
-a selective drop in backtrack accuracy without affecting \textsc{Step} accuracy.
-
-\todo{Add PCA plots; confusion matrix of linear probe; ablation table.}
+Spectral decomposition of residual-stream activations conditioned on
+\textsc{Fork}/\textsc{Cut}/\textsc{Step} node types is deferred to future work.
+We plan to apply PCA/SVD to test whether backtracking occupies a distinguishable
+representational subspace and whether ablating that direction selectively
+degrades backtrack accuracy.
 
 \subsection{E4: Transfer to Natural-Language Reasoning}
 \label{sec:e4}

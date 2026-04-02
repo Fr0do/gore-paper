@@ -20,10 +20,12 @@
 \usepackage{algorithm}
 \usepackage{algorithmic}
 \usepackage{tikz}
+\usetikzlibrary{shapes.geometric,arrows.meta,positioning,fit,backgrounds,calc}
+\usepackage{pgfplots}
+\pgfplotsset{compat=1.18}
 \usepackage{mathpartir}
 
-% Bibliography
-\usepackage[numbers]{natbib}
+% Bibliography — natbib is loaded automatically by neurips_2026.sty
 
 % ── Macros ───────────────────────────────────────────────────────────────────
 \newcommand{\gore}{\textsc{Gore}}
@@ -48,6 +50,8 @@
 \begin{abstract}
 \input{sections/00_abstract}
 \end{abstract}
+
+\input{sections/fig_visual_abstract}
 
 \input{sections/01_introduction}
 \input{sections/02_related_work}
