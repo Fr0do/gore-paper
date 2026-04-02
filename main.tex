@@ -1,0 +1,226 @@
+\documentclass{article}
+
+% NeurIPS 2026 workshop style — sty file assumed available in build environment
+\usepackage{neurips_2026}
+
+% Standard packages
+\usepackage[utf8]{inputenc}
+\usepackage[T1]{fontenc}
+\usepackage{hyperref}
+\usepackage{url}
+\usepackage{booktabs}
+\usepackage{amsfonts}
+\usepackage{amsmath}
+\usepackage{amssymb}
+\usepackage{nicefrac}
+\usepackage{microtype}
+\usepackage{xcolor}
+\usepackage{graphicx}
+\usepackage{listings}
+\usepackage{algorithm}
+\usepackage{algorithmic}
+
+% Bibliography
+\usepackage[numbers]{natbib}
+
+% Convenience macros
+\newcommand{\gore}{\textsc{Gore}}
+\newcommand{\todo}[1]{\textcolor{red}{\textbf{[TODO: #1]}}}
+
+% -----------------------------------------------------------------------
+
+\title{GORE: A Controlled Environment for Training and Evaluating
+       Backtracking Reasoning in Language Models}
+
+\author{%
+  % TODO: fill in author block
+  Anonymous Author(s) \\
+  \texttt{anonymous@example.com}
+}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+% TODO: write abstract (~150 words).
+% Key points to hit:
+%   - LLMs struggle with multi-step backtracking / systematic search
+%   - GORE: minimal Turing-complete graph-rewriting language with explicit backtracking semantics
+%   - Fully synthetic, curriculum-controlled training data
+%   - SFT baseline + GRPO with dense reward signal
+%   - Spectral-R1: representation-level analysis of the learned reasoning process
+%   - Transfer signal to natural-language reasoning benchmarks
+\todo{Write abstract}
+\end{abstract}
+
+% -----------------------------------------------------------------------
+\section{Introduction}
+\label{sec:intro}
+
+% TODO: motivate the problem of backtracking reasoning in LLMs.
+% - Transformers as "forward-only" reasoners; failure modes on search/planning tasks
+% - Why controlled synthetic environments matter (cf. BabyAI, ARC, etc.)
+% - GORE as a minimal Turing-complete substrate: designed so that *every* non-trivial
+%   program requires backtracking to evaluate
+% - Overview of contributions:
+%     1. The GORE language and interpreter
+%     2. Synthetic curriculum generator
+%     3. Training experiments (SFT, GRPO)
+%     4. Spectral-R1 analysis framework
+%     5. NL transfer results
+\todo{Write introduction}
+
+% -----------------------------------------------------------------------
+\section{The \gore{} Language}
+\label{sec:language}
+
+\subsection{Design Principles}
+\label{sec:design}
+
+% TODO: articulate design goals
+% - Minimal: fewest primitives needed for Turing completeness
+% - Transparent: execution trace is a human-readable sequence of rewrite steps
+% - Backtrack-forcing: no program of interest is solvable by linear scan
+% - Formally specified: full small-step operational semantics
+\todo{Describe design principles}
+
+\subsection{Syntax}
+\label{sec:syntax}
+
+% TODO: give BNF / grammar table for GORE
+% Reference the GORE repo (https://github.com/Fr0do/gore) for interpreter source
+\todo{Define syntax}
+
+\subsection{Operational Semantics}
+\label{sec:semantics}
+
+% TODO: small-step semantics as inference rules (mathpar or proof trees)
+% Highlight the rules that introduce / resolve choice points (backtrack edges)
+\todo{Define operational semantics}
+
+\subsection{Complexity and Expressiveness}
+\label{sec:expressiveness}
+
+% TODO: sketch Turing-completeness argument; note relevant complexity classes
+% for the benchmark suite (e.g. fixed-depth search is in PSPACE)
+\todo{Discuss expressiveness}
+
+% -----------------------------------------------------------------------
+\section{Synthetic Data Generation}
+\label{sec:data}
+
+\subsection{Program Sampler}
+\label{sec:sampler}
+
+% TODO: describe the parameterized generator
+% - Knobs: graph depth D, branching factor B, backtrack frequency F
+% - Rejection sampling to hit target difficulty buckets
+\todo{Describe program sampler}
+
+\subsection{Curriculum}
+\label{sec:curriculum}
+
+% TODO: curriculum schedule: easy → hard over training
+% - Stage definitions (e.g., D=2,B=2 → D=4,B=4 → D=6,B=6)
+% - How difficulty is measured (number of backtrack steps in gold trace)
+\todo{Describe curriculum}
+
+\subsection{Trace Format}
+\label{sec:trace}
+
+% TODO: describe the token format fed to the model
+% - <think> block containing step-by-step rewrite trace
+% - Final answer token
+% - Example (small program, full trace)
+\todo{Describe trace format and show an example}
+
+% -----------------------------------------------------------------------
+\section{Experiments}
+\label{sec:experiments}
+
+\subsection{E1: Supervised Fine-Tuning Baseline}
+\label{sec:e1}
+
+% TODO:
+% - Model(s): base LM (e.g. Qwen-2.5-7B or similar)
+% - Training setup: dataset size, curriculum schedule, hyperparameters
+% - Metrics: exact-match on held-out GORE programs; backtrack accuracy
+% - Ablations: with/without curriculum, trace length analysis
+\todo{Report SFT baseline results}
+
+\subsection{E2: GRPO with Dense Backtracking Reward}
+\label{sec:e2}
+
+% TODO:
+% - Reward design: partial credit per correct rewrite step (dense),
+%   +1 for correct final answer, 0 otherwise
+% - GRPO training loop, KL budget, group size G
+% - Comparison to E1; learning curves
+% - Emergent backtracking behavior (qualitative examples)
+\todo{Report GRPO results}
+
+\subsection{E3: Spectral-R1 Analysis}
+\label{sec:e3}
+
+% TODO:
+% - Spectral-R1 framework: PCA / SVD of residual-stream activations
+%   conditioned on reasoning state (forward pass vs. backtrack step)
+% - Do backtrack steps occupy a distinguishable subspace?
+% - Intervention experiments: ablate the "backtrack direction" → performance drop?
+% - Connection to broader Spectral-R1 research agenda
+\todo{Report spectral analysis results}
+
+\subsection{E4: Transfer to Natural-Language Reasoning}
+\label{sec:e4}
+
+% TODO:
+% - Evaluate GORE-trained model (or adapter) on NL benchmarks
+%   (e.g., GSM8K, MATH, ARC-Challenge, or a custom backtracking-heavy subset)
+% - Zero-shot and few-shot settings
+% - Compare to equivalent compute on NL data only
+\todo{Report NL transfer results}
+
+% -----------------------------------------------------------------------
+\section{Related Work}
+\label{sec:related}
+
+% TODO: cover the following clusters (1–2 paragraphs each):
+%
+% 1. Synthetic reasoning environments
+%    - BabyAI, ARC, CLUTRR, Countdown, etc.
+%
+% 2. Chain-of-thought and scratchpad reasoning
+%    - Wei et al. (2022), Nye et al. (2021), Lightman et al. (2023)
+%
+% 3. Reinforcement learning for LLM reasoning
+%    - RLHF (Ouyang et al.), GRPO (Shao et al.), DeepSeek-R1, DAPO
+%
+% 4. Backtracking / search in language models
+%    - Tree-of-Thoughts (Yao et al.), RAP, Monte-Carlo Tree Search for LLMs
+%
+% 5. Mechanistic interpretability of reasoning
+%    - Logit lens, probing, linear representation hypothesis
+%    - Spectral / SVD analyses of transformer internals
+\todo{Write related work}
+
+% -----------------------------------------------------------------------
+\section{Conclusion}
+\label{sec:conclusion}
+
+% TODO:
+% - Summary of contributions
+% - Limitations: GORE is synthetic; transfer gap may exist for real-world tasks
+% - Future work: larger models, richer reward shaping, multi-agent GORE
+\todo{Write conclusion}
+
+% -----------------------------------------------------------------------
+\section*{Acknowledgements}
+% TODO: add acknowledgements / funding statement before camera-ready
+\todo{Add acknowledgements}
+
+% -----------------------------------------------------------------------
+\bibliographystyle{plainnat}
+\bibliography{references}
+
+\end{document}
