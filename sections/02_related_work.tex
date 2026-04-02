@@ -1,0 +1,84 @@
+\section{Related Work}
+\label{sec:related}
+
+\paragraph{Formal theorem proving and language models.}
+Neural theorem proving has emerged as a demanding testbed for systematic search
+in language models.
+LeanDojo \citep{yang2023leandojo} released an open-source toolkit with 98\,K
+Lean theorems and the ReProver retrieval-augmented baseline, demonstrating that
+tactic prediction can be framed as a retrieval-then-generation problem.
+HyperTree Proof Search \citep{lample2022hypertree} applied an AlphaZero-style
+MCTS policy to Metamath, achieving 82.6\% success on a standard benchmark.
+CoqGym \citep{yang2019coqgym} provided 71\,K Coq proof traces together with the
+ASTactic tactic synthesis baseline.
+Draft-Sketch-Prove \citep{jiang2023dsp} (ICLR 2023 oral) showed that bridging
+informal and formal proofs via sketch generation substantially reduces the
+burden on the formal prover.
+LEGO-Prover \citep{wang2024legoprover} (ICLR 2024 oral) maintained a growing
+skill library that is reused across proofs, improving both success rate and
+efficiency.
+\gore{} is not a theorem prover, but it exploits the same structural pattern:
+all these systems require backtracking search over a tree of tactic applications.
+The key distinction is that \gore{} provides a \emph{minimal} substrate
+designed specifically to isolate backtracking from the syntactic and
+type-theoretic complexity of production proof assistants, while the structural
+isomorphism (Section~\ref{sec:isomorphism}) makes existing proof corpora
+directly usable as pretraining data.
+
+\paragraph{Reinforcement learning for LLM reasoning.}
+GRPO \citep{shao2024deepseekmath} introduced group relative policy optimisation,
+which eliminates the critic model by normalising rewards within a group of
+sampled outputs, substantially reducing memory overhead.
+DAPO \citep{yu2025dapo} extended this with decoupled clip ratios, dynamic
+sampling, and token-level policy gradient, improving stability at scale.
+Dr.\,GRPO corrects a bias that arises in GRPO when different prompts admit
+unequal numbers of valid solutions---a bias that is directly relevant to
+\gore{}, where programs with depth $d$ and branching factor $w$ admit $w^d$
+valid traces.
+A complementary line of work studies \emph{process reward models}
+\citep{lightman2023lets}: models trained to score intermediate reasoning steps
+rather than final answers.
+Training a PRM requires either costly human step-level annotation or a separate
+reward model.
+\gore{}'s interpreter supplies step-level rewards for free, providing the
+cleanest possible setup for studying dense vs.\ sparse reward.
+
+\paragraph{Code-augmented reasoning and task decomposition.}
+PAL \citep{gao2023pal} demonstrated that delegating computation to a Python
+interpreter---rather than simulating it in natural language---substantially
+improves arithmetic and symbolic reasoning.
+The same principle underlies Program-of-Thought, Text-to-SQL (Spider
+\citep{yu2018spider}, BIRD), and CTE-tree decomposition of complex queries.
+In all these settings, an external interpreter verifies correctness, providing
+ground-truth reward without human annotation.
+\gore{} generalises this idea: where PAL uses Python as the host language and
+SQL uses relational algebra, \gore{} uses a minimal logic-programming-style
+language whose \callstmt{} nodes correspond exactly to external tool calls in
+agent frameworks.
+The structural isomorphism between CTE trees and \gore{} programs
+(Section~\ref{sec:isomorphism}) means that Spider\,/\,BIRD can serve as a
+pretraining source for the \callstmt{} primitive.
+
+\paragraph{Synthetic reasoning environments.}
+BabyAI, ARC, and CLUTRR provide controlled tasks for probing reasoning in
+language models, but none isolates backtracking search as the target skill.
+Tree-of-Thoughts \citep{yao2024tree} and Monte-Carlo Tree Search variants for
+LLMs impose a search policy at inference time but do not modify the model's
+internal representation of the search.
+\gore{} is the first environment where (a) the search tree is a first-class
+syntactic object in the model's output, (b) every non-trivial program requires
+backtracking, and (c) step-level reward is available without additional
+annotation.
+
+\paragraph{Mechanistic interpretability of reasoning.}
+The linear representation hypothesis and probing classifiers have revealed that
+transformers encode factual attributes in interpretable directions
+\citep{lightman2023lets}.
+Spectral analyses of residual-stream activations have identified low-rank
+structure in the representations of arithmetic and logical operations.
+Our Spectral-R1 analysis (Section~\ref{sec:e3}) extends this programme to
+backtracking-specific structure: we test whether \textsc{Fork}, \textsc{Cut},
+and \textsc{Step} activations occupy distinguishable subspaces and whether
+ablating the ``backtrack direction'' causes a measurable performance drop.
+Because \gore{} uses synthetic data with no natural-language noise, these
+experiments are cleaner than analogous analyses on CoT traces.

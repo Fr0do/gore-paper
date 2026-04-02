@@ -1,0 +1,147 @@
+\section{Methodology}
+\label{sec:methodology}
+
+\subsection{The \gore{} Language}
+\label{sec:language}
+
+\gore{} is a declarative, relation-based language in the logic-programming
+tradition, distinguished by making the search tree a first-class syntactic
+object, augmented with a functional sublanguage for deterministic computation
+and explicit effect annotations for non-deterministic external calls.
+
+\paragraph{Grammar.}
+\todo{Insert BNF grammar table: Program, Clause, Body, Primitive, Term.}
+
+\paragraph{Five primitives.}
+\begin{description}
+  \item[\textsc{Step}$(t_1, t_2)$] Unification / result binding.
+    Succeeds if $t_1$ and $t_2$ unify under the current substitution; extends
+    the substitution on success and fails otherwise.
+    Corresponds to deterministic forward progress; no choice point is created.
+  \item[\textsc{Fork}$(B_1, \ldots, B_k)$] Non-deterministic branching.
+    Creates $k$ choice points and evaluates each branch $B_i$ in order
+    (depth-first, left-to-right by default).
+    On failure of branch $B_i$ the interpreter backtracks and tries $B_{i+1}$.
+  \item[\textsc{Cut}$(B, \ell)$] Labelled branch pruning.
+    Evaluates body $B$; if $B$ fails, jumps to label $\ell$, pruning all
+    open choice points between the current point and $\ell$.
+    Semantics: deterministic abort, not backtracking.
+  \item[\letstmt{} $x \mathrel{:=} e$] Deterministic functional computation.
+    Evaluates expression $e$ (arithmetic, string, list operations) and binds
+    the result to $x$ with no backtrack point.
+  \item[\callstmt{} $r \mathrel{=} @f(a_1, \ldots, a_n)$] External effect.
+    Invokes external function $f$ with arguments $a_i$, binds the result to $r$,
+    and logs the call as a $(f, \mathbf{a}, r)$ node in the execution trace.
+    In synthetic training, $f$ is a mock oracle; at inference time, $f$ can be a
+    tool, API, or sub-agent.
+\end{description}
+
+\paragraph{Operational semantics.}
+\todo{Insert small-step inference rules using \texttt{mathpartir} or
+      \texttt{proof} environment.  One rule per primitive.}
+
+\subsection{Interpreter as Process Reward Model}
+\label{sec:interpreter-prm}
+
+The \gore{} interpreter evaluates a predicted trace node-by-node against the
+gold trace and returns a dense scalar reward at each step.
+No human annotation and no separately trained reward model are required.
+
+\begin{verbatim}
+def gore_reward(predicted_trace, correct_trace):
+    step_rewards = []
+    for pred, gold in zip(predicted_trace, correct_trace):
+        if pred.type == gold.type:       # correct node type
+            r = 0.3
+            if pred.env == gold.env:     # correct environment binding
+                r = 0.7
+            if pred == gold:             # exact match
+                r = 1.0
+        else:
+            r = -0.5
+        step_rewards.append(r)
+    return mean(step_rewards)
+\end{verbatim}
+
+This function is the PRM.
+The three reward levels (0.3 / 0.7 / 1.0) provide a curriculum within a single
+trace: the model receives credit for getting the node type right, additional
+credit for correct environment state, and full credit for exact prediction.
+Incorrect node types are penalised at $-0.5$.
+
+\todo{Formalise as a definition; add discussion of why this decomposition
+      (type $\to$ env $\to$ exact) captures the relevant structure.}
+
+\subsection{Structural Isomorphism with Lean/Coq Tactics}
+\label{sec:isomorphism}
+
+The five \gore{} primitives are structurally isomorphic to five standard
+Lean\,/\,Coq tactic combinators.
+This is not a metaphor but a design decision: any model pretrained on tactic
+traces already has an inductive bias toward tree-structured search that
+transfers to \gore{}.
+
+\begin{table}[h]
+  \centering
+  \caption{Structural isomorphism between \gore{} primitives and Lean\,/\,Coq
+           tactics (left), and between \gore{} primitives and the Decomposer
+           framework (right).}
+  \label{tab:isomorphism}
+  \begin{tabular}{lll}
+    \toprule
+    Lean\,/\,Coq tactic & \gore{} primitive & Decomposer concept \\
+    \midrule
+    \texttt{exact e}       & \textsc{Step}  & \texttt{return result} \\
+    \texttt{cases h}       & \textsc{Fork}  & \texttt{raise NotImplementedError} \\
+    \texttt{contradiction} & \textsc{Cut}   & \texttt{refuse} \\
+    \texttt{have h := e}   & \letstmt{}     & \texttt{x = expr} \\
+    \texttt{apply f}       & \callstmt{}    & \texttt{tool\_call(args)} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\todo{Add formal definition of the isomorphism as a functor between the
+      respective operational semantics.}
+
+\subsection{Training Pipeline}
+\label{sec:training}
+
+We use a three-stage pipeline.
+
+\paragraph{Stage 1: Formal proof pretraining.}
+We fine-tune on tactic traces extracted from LeanDojo
+\citep{yang2023leandojo} (${\approx}98$K theorems) and CoqGym
+\citep{yang2019coqgym} (${\approx}71$K proofs), using the isomorphism in
+Table~\ref{tab:isomorphism} to convert each tactic to its \gore{} counterpart
+via \texttt{lean2gore.py} and \texttt{coqgym2gore.py}.
+The goal is to instil an inductive bias for tree-structured search before the
+model sees any \gore{} syntax.
+
+\paragraph{Stage 2: \gore{} curriculum fine-tuning.}
+We fine-tune on synthetic \gore{} programs generated by \texttt{goregen.py} at
+five difficulty levels (Section~\ref{sec:curriculum}).
+The model learns to predict full execution traces, supervised by maximum
+likelihood.
+
+\paragraph{Stage 3: Dr.\,GRPO with dense interpreter reward.}
+We continue training with Dr.\,GRPO using the dense reward function from
+Section~\ref{sec:interpreter-prm}.
+Dr.\,GRPO corrects the selection bias of standard GRPO that arises because
+deeper \gore{} programs admit exponentially more valid traces.
+We ablate with GRPO + sparse reward (E2a) and DAPO (E2c).
+
+\todo{Add pseudocode for the full training loop; clarify model size and
+      hardware budget.}
+
+\subsection{Curriculum Design}
+\label{sec:curriculum}
+
+The curriculum is parameterised by depth $d \in \{1,2,3,4,5\}$ and branching
+factor $w \in \{1,2,3\}$.
+A level-$\ell$ program has $d \leq \ell + 1$ and $w \leq \ell + 1$, giving
+five difficulty levels (0--4).
+Task families: enumeration (level 0--1), graph reachability (level 1--2), list
+membership (level 2--3), recursive decomposition (level 3--4).
+
+\todo{Add table: level $\times$ (d, w, \# atoms, expected backtrack depth,
+      sample count).}

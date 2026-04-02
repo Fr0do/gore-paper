@@ -1,0 +1,103 @@
+\section{Experiments}
+\label{sec:experiments}
+
+All experiments use a decoder-only language model at GPT-2 scale unless
+otherwise noted.
+Evaluation metric: exact-match trace accuracy on a held-out set of 1\,000
+programs per difficulty level, plus backtrack accuracy (fraction of
+\textsc{Fork} nodes where the correct branch is selected).
+
+\subsection{E1: SFT Baseline}
+\label{sec:e1}
+
+\paragraph{Setup.}
+We fine-tune on \gore{} curriculum data (levels 0--4, ${\approx}$100K programs
+total) using maximum-likelihood supervision on full execution traces.
+Training proceeds for 3 epochs with a cosine learning-rate schedule; we use the
+trace format described in Section~\ref{sec:language}.
+
+\paragraph{Metrics.}
+Exact-match trace accuracy; per-level accuracy breakdown;
+backtrack accuracy; trace length distribution.
+
+\paragraph{Expected outcome.}
+SFT should achieve high accuracy at levels 0--2 and degrade at levels 3--4,
+motivating the RL stage.
+
+\todo{Fill in actual numbers; add learning curves; ablation over curriculum
+      ordering (random vs.\ staged).}
+
+\subsection{E2: Dense vs.\ Sparse Reward (Dr.\,GRPO)}
+\label{sec:e2}
+
+We study three conditions:
+
+\paragraph{E2a: GRPO + sparse reward.}
+Standard GRPO \citep{shao2024deepseekmath} with binary reward: $+1$ if the
+final answer is correct, $0$ otherwise.
+This is the baseline RL condition.
+
+\paragraph{E2b: Dr.\,GRPO + dense reward.}
+Dr.\,GRPO with the per-step interpreter reward from
+Section~\ref{sec:interpreter-prm}.
+This is the main experimental condition.
+The comparison E2a vs.\ E2b isolates the value of dense reward; the comparison
+E1 vs.\ E2b isolates the value of RL over SFT.
+
+\paragraph{E2c: DAPO.}
+DAPO \citep{yu2025dapo} as a memory-efficient ablation (no KL penalty, dynamic
+clip, token-level policy gradient).
+Same sparse reward as E2a to control for the reward signal.
+
+\paragraph{Metrics.}
+Trace accuracy per level; backtrack accuracy; reward curve; KL divergence from
+SFT initialisation; GPU memory consumption.
+
+\todo{Fill in results; add per-level accuracy table; add qualitative examples
+      of emergent backtracking behaviour.}
+
+\subsection{E3: Spectral Analysis (Spectral-R1)}
+\label{sec:e3}
+
+We apply PCA and SVD to the residual-stream activations of the Dr.\,GRPO model,
+conditioned on the node type of the \emph{current} trace token
+(\textsc{Fork}, \textsc{Cut}, or \textsc{Step}).
+
+\paragraph{Setup.}
+We collect activations at the final residual stream position for 10\,000 trace
+tokens (balanced across node types) from the E2b model.
+We fit PCA jointly on all three conditions and inspect the leading principal
+components.
+
+\paragraph{Intervention.}
+We ablate the direction most predictive of \textsc{Fork} vs.\ \textsc{Step}
+(identified by a linear probe) and measure the drop in backtrack accuracy.
+
+\paragraph{Expected outcome.}
+We expect \textsc{Fork}/\textsc{Cut} activations to occupy a distinguishable
+subspace from \textsc{Step} activations, and ablation of this subspace to cause
+a selective drop in backtrack accuracy without affecting \textsc{Step} accuracy.
+
+\todo{Add PCA plots; confusion matrix of linear probe; ablation table.}
+
+\subsection{E4: Transfer to Natural-Language Reasoning}
+\label{sec:e4}
+
+We evaluate the E2b model (and an SFT-only baseline) on natural-language
+reasoning benchmarks after adapter fine-tuning on a small NL dataset.
+
+\paragraph{Benchmarks.}
+GSM8K (arithmetic multi-step), ARC-Challenge (science QA), and a
+backtracking-heavy subset of MATH.
+
+\paragraph{Setup.}
+Zero-shot and 5-shot evaluation; comparison to an equivalent-compute baseline
+trained on NL data only.
+
+\paragraph{Expected outcome.}
+\gore{}-pretrained models should show improved performance on tasks that require
+systematic search (multi-step arithmetic with correction, proof-by-cases), with
+smaller gains on tasks that are primarily forward-only.
+
+\todo{Fill in benchmark numbers; add breakdown by task type; discuss
+      failure cases.}

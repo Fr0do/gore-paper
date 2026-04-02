@@ -1,0 +1,22 @@
+Large language models trained with chain-of-thought prompting have shown
+impressive multi-step reasoning, yet they remain fundamentally forward-only
+reasoners: when a reasoning path fails, models cannot backtrack and
+systematically explore alternatives.
+We introduce \gore{} (\textbf{G}raph-\textbf{O}rchestrated \textbf{R}easoning
+\textbf{E}nvironment), a minimal formal language that makes the search tree a
+first-class syntactic object.
+\gore{} has five primitives---\textsc{Step}, \textsc{Fork}, \textsc{Cut},
+\letstmt{}, and \callstmt{}---whose operational semantics are structurally
+isomorphic to Lean\,/\,Coq tactics (\texttt{exact}$\to$\textsc{Step},
+\texttt{cases}$\to$\textsc{Fork}, \texttt{contradiction}$\to$\textsc{Cut},
+\texttt{have}$\to$\letstmt{}, \texttt{apply}$\to$\callstmt{}).
+This isomorphism enables a natural three-stage training pipeline: formal proof
+pretraining instills an inductive bias for tree-structured search;
+\gore{} curriculum fine-tuning transfers that bias to the explicit backtracking
+syntax; and Dr.\,GRPO reinforcement learning with dense interpreter reward
+aligns the model on verifiable reasoning chains.
+Crucially, the \gore{} interpreter acts as a Process Reward Model, supplying
+per-step verification signals without any human annotation.
+We report an SFT baseline, a dense-vs.-sparse reward ablation (Dr.\,GRPO
+vs.\ GRPO), a spectral analysis of learned backtracking representations
+(Spectral-R1), and zero-shot transfer to natural-language reasoning benchmarks.

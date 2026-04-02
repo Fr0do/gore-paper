@@ -1,8 +1,141 @@
 % references.bib — bibliography for GORE paper
 % NeurIPS 2026 workshop submission
 %
-% Conventions:
-%   - Key format: AuthorYYYYkeyword  (e.g., Wei2022chain)
-%   - Group entries by section: [reasoning environments], [CoT], [RL for LLMs],
-%     [backtracking/search], [mechanistic interp]
-%   - Keep DOI or arXiv URL in the `url` field
+% Key format: authoryearword  (e.g., wei2022chain)
+% Grouped by theme: [theorem proving], [RL for LLMs], [CoT/reasoning],
+%   [code-augmented reasoning], [synthetic environments], [architecture]
+
+% ── Theorem Proving ──────────────────────────────────────────────────────────
+
+@inproceedings{yang2023leandojo,
+  title     = {{LeanDojo}: Theorem Proving with Retrieval-Augmented Language Models},
+  author    = {Yang, Kaiyu and Swope, Aidan and Gu, Alex and Chalamala, Rahul
+               and Song, Peiyang and Yu, Shixing and Godil, Saad and Prenger, Ryan
+               and Anandkumar, Anima},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {36},
+  year      = {2023}
+}
+
+@inproceedings{lample2022hypertree,
+  title     = {{HyperTree} Proof Search for Neural Theorem Proving},
+  author    = {Lample, Guillaume and Lacroix, Timothee and Lachaux, Marie-Anne
+               and Rodriguez, Aurelien and Hayat, Amaury and Lavril, Thibaut
+               and Ebner, Gabriel and Martinet, Xavier},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {35},
+  year      = {2022}
+}
+
+@inproceedings{yang2019coqgym,
+  title        = {Learning to Prove Theorems via Interacting with Proof Assistants},
+  author       = {Yang, Kaiyu and Deng, Jia},
+  booktitle    = {International Conference on Machine Learning},
+  pages        = {6984--6994},
+  year         = {2019},
+  organization = {PMLR}
+}
+
+@inproceedings{jiang2023dsp,
+  title     = {Draft, Sketch, and Prove: Guiding Formal Theorem Provers
+               with Informal Proofs},
+  author    = {Jiang, Albert and Welleck, Sean and Zhou, Jin Peng and Li, Wenda
+               and Liu, Jiacheng and Jamnik, Mateja and Lacroix, Timothee
+               and Wu, Yuhuai and Lample, Guillaume},
+  booktitle = {International Conference on Learning Representations},
+  year      = {2023}
+}
+
+@inproceedings{wang2024legoprover,
+  title     = {{LEGO-Prover}: Neural Theorem Proving with Growing Libraries},
+  author    = {Wang, Haiming and Xin, Huajian and Zheng, Chuanyang and Li, Lin
+               and Liu, Zhengying and Cao, Qingxing and Huang, Yinya and Xiong, Jing
+               and Shi, Han and Xie, Enze and others},
+  booktitle = {International Conference on Learning Representations},
+  year      = {2024}
+}
+
+% ── RL for LLM Reasoning ─────────────────────────────────────────────────────
+
+@article{shao2024deepseekmath,
+  title   = {{DeepSeekMath}: Pushing the Limits of Mathematical Reasoning
+             in Open Language Models},
+  author  = {Shao, Zhihong and Wang, Peiyi and Zhu, Qihao and Xu, Runxin
+             and Song, Junxiao and Zhang, Mingchuan and Li, YK and Wu, Y
+             and Guo, Daya},
+  journal = {arXiv preprint arXiv:2402.03300},
+  year    = {2024}
+}
+
+@article{yu2025dapo,
+  title   = {{DAPO}: An Open-Source {LLM} Reinforcement Learning System at Scale},
+  author  = {Yu, Qiying and others},
+  journal = {arXiv preprint arXiv:2503.14476},
+  year    = {2025}
+}
+
+@article{lightman2023lets,
+  title   = {Let's Verify Step by Step},
+  author  = {Lightman, Hunter and Kosaraju, Vineet and Burda, Yura
+             and Edwards, Harrison and Baker, Bowen and Lee, Teddy
+             and Leike, Jan and Schulman, John and Sutskever, Ilya
+             and Cobbe, Karl},
+  journal = {arXiv preprint arXiv:2305.20050},
+  year    = {2023}
+}
+
+% ── Chain-of-Thought / Search ─────────────────────────────────────────────────
+
+@inproceedings{wei2022chain,
+  title     = {Chain-of-Thought Prompting Elicits Reasoning in Large Language Models},
+  author    = {Wei, Jason and Wang, Xuezhi and Schuurmans, Dale and Bosma, Maarten
+               and Xia, Feiqi and Chi, Ed and Le, Quoc V and Zhou, Denny},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {35},
+  year      = {2022}
+}
+
+@inproceedings{yao2024tree,
+  title     = {Tree of Thoughts: Deliberate Problem Solving with Large Language Models},
+  author    = {Yao, Shunyu and Yu, Dian and Zhao, Jeffrey and Shafran, Izhak
+               and Griffiths, Thomas L and Cao, Yuan and Narasimhan, Karthik},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {36},
+  year      = {2024}
+}
+
+% ── Code-Augmented Reasoning / Task Decomposition ────────────────────────────
+
+@inproceedings{gao2023pal,
+  title        = {{PAL}: Program-Aided Language Models},
+  author       = {Gao, Luyu and Madaan, Aman and Zhou, Shuyan and Alon, Uri
+                  and Liu, Pengfei and Yang, Yiming and Callan, Jamie
+                  and Neubig, Graham},
+  booktitle    = {International Conference on Machine Learning},
+  pages        = {10764--10799},
+  year         = {2023},
+  organization = {PMLR}
+}
+
+@inproceedings{yu2018spider,
+  title     = {Spider: A Large-Scale Human-Labeled Dataset for Complex and
+               Cross-Domain Semantic Parsing and Text-to-{SQL} Task},
+  author    = {Yu, Tao and Zhang, Rui and Yang, Kai and Yasunaga, Michihiro
+               and Wang, Dongxu and Li, Zifan and Ma, James and Li, Irene
+               and Yao, Qingning and Roman, Shanelle and others},
+  booktitle = {Conference on Empirical Methods in Natural Language Processing},
+  year      = {2018}
+}
+
+% ── Architecture ─────────────────────────────────────────────────────────────
+
+@inproceedings{sun2024yoco,
+  title     = {You Only Cache Once: Decoder-Decoder Architectures for
+               Language Models},
+  author    = {Sun, Yutao and Dong, Li and Patra, Shaohan and Ma, Shuming
+               and Huang, Shaohan and Benhaim, Alon and Chaudhary, Vishrav
+               and Song, Xia and Wei, Furu},
+  booktitle = {Advances in Neural Information Processing Systems},
+  volume    = {37},
+  year      = {2024}
+}

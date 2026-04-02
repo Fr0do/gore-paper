@@ -1,0 +1,55 @@
+\section{Results}
+\label{sec:results}
+
+\todo{Populate with actual numbers from experiments.}
+
+\begin{table}[h]
+  \centering
+  \caption{Trace accuracy (\%) by difficulty level and training condition.
+           Higher is better.}
+  \label{tab:main-results}
+  \begin{tabular}{lccccc}
+    \toprule
+    Condition & Level 0 & Level 1 & Level 2 & Level 3 & Level 4 \\
+    \midrule
+    E1 SFT                     & \todo{} & \todo{} & \todo{} & \todo{} & \todo{} \\
+    E2a GRPO + sparse          & \todo{} & \todo{} & \todo{} & \todo{} & \todo{} \\
+    E2b Dr.\,GRPO + dense      & \todo{} & \todo{} & \todo{} & \todo{} & \todo{} \\
+    E2c DAPO + sparse          & \todo{} & \todo{} & \todo{} & \todo{} & \todo{} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}[h]
+  \centering
+  \caption{Backtrack accuracy (\%) by condition.}
+  \label{tab:backtrack-accuracy}
+  \begin{tabular}{lcc}
+    \toprule
+    Condition & Backtrack acc.\ & \textsc{Step} acc.\ \\
+    \midrule
+    E1 SFT                & \todo{} & \todo{} \\
+    E2a GRPO + sparse     & \todo{} & \todo{} \\
+    E2b Dr.\,GRPO + dense & \todo{} & \todo{} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\begin{table}[h]
+  \centering
+  \caption{NL transfer results (E4). Accuracy (\%) on held-out benchmarks.}
+  \label{tab:nl-transfer}
+  \begin{tabular}{lccc}
+    \toprule
+    Model & GSM8K & ARC-Challenge & MATH (search subset) \\
+    \midrule
+    NL baseline (same compute)   & \todo{} & \todo{} & \todo{} \\
+    \gore{} SFT + adapter        & \todo{} & \todo{} & \todo{} \\
+    \gore{} Dr.\,GRPO + adapter  & \todo{} & \todo{} & \todo{} \\
+    \bottomrule
+  \end{tabular}
+\end{table}
+
+\todo{Add Spectral-R1 PCA figure and intervention table (E3).}
+
+\todo{Add learning curves for E2a / E2b / E2c.}

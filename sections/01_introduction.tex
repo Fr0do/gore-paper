@@ -1,0 +1,92 @@
+\section{Introduction}
+\label{sec:intro}
+
+Large language models generate text left-to-right and, even when equipped with
+chain-of-thought \citep{wei2022chain}, commit to a single reasoning trajectory
+without the ability to retract it.
+When a reasoning path reaches a dead end, the model cannot backtrack and
+explore an alternative branch; it either continues down an incorrect path or
+abruptly changes direction without any explicit representation of the abandoned
+subgoal.
+This limitation is not merely a failure of prompting style---it reflects the
+absence of any syntactic mechanism for representing and manipulating a search
+tree.
+
+Existing controlled environments do not isolate backtracking as a learnable
+skill.
+Grid-world environments such as BabyAI and visual reasoning datasets such as
+ARC conflate spatial navigation with logical search, making it impossible to
+attribute failures specifically to backtracking.
+Formal theorem provers (Lean, Coq) do require systematic backtracking, but
+their tactic languages are complex, syntactically overlap with pretraining
+corpora, and are tightly coupled to type-theoretic foundations that introduce
+confounds for language model experiments.
+Tree-of-Thoughts \citep{yao2024tree} and Monte-Carlo Tree Search methods for
+LLMs impose a search strategy at inference time but do not train models to
+represent or execute the search tree as a syntactic object.
+
+We introduce \gore{} (\textbf{G}raph-\textbf{O}rchestrated \textbf{R}easoning
+\textbf{E}nvironment), a minimal formal language designed from the ground up so
+that every non-trivial program requires explicit backtracking to evaluate.
+\gore{} has five primitives: \textsc{Step} (unification / result binding),
+\textsc{Fork} (non-deterministic branching), \textsc{Cut} (labelled branch
+pruning), \letstmt{} (deterministic functional computation), and \callstmt{}
+(explicit external effect).
+The language uses novel syntax with zero overlap with natural-language
+pretraining corpora, eliminating leakage as a confound.
+A key structural observation underlies our design: \gore{} primitives are
+\emph{structurally isomorphic} to standard Lean\,/\,Coq tactic combinators
+(\texttt{cases}$\to$\textsc{Fork}, \texttt{exact}$\to$\textsc{Step},
+\texttt{contradiction}$\to$\textsc{Cut}, \texttt{apply}$\to$\callstmt{},
+\texttt{have}$\to$\letstmt{}), making theorem-proving corpora a natural
+pretraining domain.
+
+The \gore{} interpreter serves as a \emph{Process Reward Model} (PRM) without
+any additional training.
+At every step of execution, the interpreter verifies whether the predicted
+trace node (type, environment binding, unification result) is correct and
+returns a dense scalar reward.
+This stands in sharp contrast to prior PRM work \citep{lightman2023lets}, which
+requires either human annotation of intermediate steps or a separately trained
+critic model.
+The interpreter \emph{is} the PRM: step-level verification is free by
+construction.
+
+\gore{}'s \callstmt{} primitive and recursive clause structure formalize the
+same recursive task-decomposition pattern that underlies program-aided reasoning
+\citep{gao2023pal}, structured query decomposition (Text-to-SQL via CTE trees,
+\citealt{yu2018spider}), and the broader ``Decomposer'' paradigm.
+In all these settings a complex task is broken into sub-tasks that are
+dispatched to tools or sub-agents; \gore{} makes this structure explicit and
+verifiable, enabling dense reward at every node of the decomposition tree.
+
+Our contributions are as follows.
+\begin{enumerate}
+  \item \textbf{\gore{} language.}
+    A minimal five-primitive formal language with full operational semantics,
+    a reference interpreter, and a parameterised curriculum generator.
+  \item \textbf{Structural isomorphism.}
+    A formal correspondence between \gore{} primitives and Lean\,/\,Coq tactic
+    combinators, enabling warm-start pretraining on existing proof corpora
+    (LeanDojo \citep{yang2023leandojo}, CoqGym \citep{yang2019coqgym}).
+  \item \textbf{Interpreter-as-PRM.}
+    Dense step-level reward from the \gore{} interpreter without human
+    annotation or a separate reward model, providing the cleanest possible
+    ablation of dense vs.\ sparse reward in an RL-for-reasoning setting.
+  \item \textbf{Three-stage training pipeline.}
+    Formal proof pretraining $\to$ \gore{} curriculum SFT $\to$ Dr.\,GRPO with
+    dense interpreter reward; ablations with GRPO+sparse and DAPO.
+  \item \textbf{Spectral-R1 analysis.}
+    Spectral decomposition of residual-stream activations conditioned on
+    \textsc{Fork}/\textsc{Cut}/\textsc{Step} node types, providing mechanistic
+    evidence that backtracking occupies a distinguishable representational
+    subspace.
+\end{enumerate}
+
+The remainder of the paper is organised as follows.
+Section~\ref{sec:related} situates \gore{} within the literature.
+Section~\ref{sec:methodology} defines the language, interpreter-as-PRM, and
+training pipeline.
+Section~\ref{sec:experiments} describes the four experimental conditions.
+Section~\ref{sec:results} reports results.
+Section~\ref{sec:conclusion} concludes with limitations and future work.
